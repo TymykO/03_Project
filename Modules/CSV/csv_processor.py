@@ -1,7 +1,8 @@
 import csv
 import os
 from openpyxl import load_workbook
-from Functions import data_transformer
+from Modules.Transform import data_transformer
+from Modules.Utils.file_manager import get_csv_files
 
 #Збереження списку у csv
 def save_list_csv(data: list, path: str):
@@ -22,6 +23,13 @@ def open_csv_list(path: str):
         print(f'Error: Unable to find file path — {e}')
         data_csv = []
     return data_csv
+
+#Збирає CSV-файли з папки CSV_creation і повертає їх шляхи.
+def list_csv_in_creation():
+    # Отримуємо абсолютний шлях до папки Data_BV/CSV_creation
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))  # Шлях до кореня проєкту
+    directory = os.path.abspath(os.path.join(base_dir, "Data_BV", "CSV_creation"))
+    return get_csv_files(directory)
 
 #---------------------------------------#
 #-----------------To Do-----------------#
@@ -104,16 +112,23 @@ def valve_data_processed(path_csv: str, deg: int):
 
 
 
-base_dir = os.path.abspath(__file__)
-print(base_dir)
-base_dir = os.path.dirname(os.path.abspath(__file__))
-print(base_dir)
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(base_dir)
-path_abs = os.path.join(base_dir,'Data_BV', 'CSV_creation','TA-BVS_DN125.csv')
+a = list_csv_in_creation()
+print(a)
 
-data_v = valve_data_processed(path_abs, 6)
-print(data_v)
+
+# base_dir = os.path.abspath(__file__)
+# print(base_dir)
+# base_dir = os.path.dirname(os.path.abspath(__file__))
+# print(base_dir)
+# base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# print(base_dir)
+# path_abs = os.path.join(base_dir,'Data_BV', 'CSV_creation','TA-BVS_DN125.csv')
+#
+# data_v = valve_data_processed(path_abs, 6)
+# print(data_v)
+
+####
+
 
 # xlsx_path1 = 'Data_BV.xlsx'
 # output_dir1 = 'CSV_creation'
