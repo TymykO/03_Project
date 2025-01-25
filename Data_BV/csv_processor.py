@@ -1,6 +1,7 @@
 import csv
 import os
 from openpyxl import load_workbook
+from Functions import data_transformer
 
 #Збереження списку у csv
 def save_list_csv(data: list, path: str):
@@ -21,6 +22,38 @@ def open_csv_list(path: str):
         print(f'Error: Unable to find file path — {e}')
         data_csv = []
     return data_csv
+
+#---------------------------------------#
+#-----------------To Do-----------------#
+# Одна функція для витягування даних з csv у потрібній формі
+def from_csv_data_sort(path: str):
+    data = open_csv_list(path)
+    top = data[0]
+    data = data[1:]
+
+    sorted_data = sorted(data, key=lambda item: float(item[0].replace(",", ".")))
+
+    x = []
+    y = []
+
+    for row in sorted_data:
+        for i, value in enumerate(row):
+            value = value.replace(",", ".")
+            try:
+                number = float(value)
+                if i == 0:
+                    x.append(number)
+                elif i == 1:
+                    y.append(number)
+                else:
+                    print(f"Error: [{i}] '{value}' is incorrect data.")
+            except ValueError:
+                print(f"Error: [{i}] '{value}' is not a valid number.")
+    return sorted_data, top, x, y
+
+#-----------------To Do-----------------#
+#---------------------------------------#
+
 
 #Збереження даних з xlsx по дві колонки у csv
 def convert_xlsx_to_csv(xlsx_path: str, output_dir: str):
@@ -58,7 +91,26 @@ def convert_xlsx_to_csv(xlsx_path: str, output_dir: str):
 
         print(csv_file_name)
 
+def valve_data_processed(path_csv: str, deg: int):
+    data = from_csv_data_sort(path_csv)
+    name = data[1][0]
+    art_nr = data[1][1]
+    x = data[2]
+    y = data[3]
+    valve_data = data_transformer.polynomial_dict(x, y, deg)
+    valve_data['name'] = name
+    valve_data['article_number'] = art_nr
+    return valve_data
+
+
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+path_abs = os.path.join(base_dir,'Data_BV', 'CSV_creation','TA-BVS_DN125.csv')
+
+data = valve_data_processed(path_abs, 6)
+print(data)
+
 # xlsx_path1 = 'Data_BV.xlsx'
 # output_dir1 = 'CSV_creation'
 
 # print(open_csv_list('CSV_creation/STAD_DN10.csv'))
+
