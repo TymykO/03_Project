@@ -103,11 +103,17 @@ def valve_data_processed(path_csv: str, deg: int):
     return valve_data
 
 
+
+base_dir = os.path.abspath(__file__)
+print(base_dir)
+base_dir = os.path.dirname(os.path.abspath(__file__))
+print(base_dir)
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print(base_dir)
 path_abs = os.path.join(base_dir,'Data_BV', 'CSV_creation','TA-BVS_DN125.csv')
 
-data = valve_data_processed(path_abs, 6)
-print(data)
+data_v = valve_data_processed(path_abs, 6)
+print(data_v)
 
 # xlsx_path1 = 'Data_BV.xlsx'
 # output_dir1 = 'CSV_creation'
