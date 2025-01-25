@@ -2,10 +2,23 @@ import csv
 import os
 from openpyxl import load_workbook
 
-def save_csv(data: list, path: str):
-    with open(path, mode="w", encoding="utf-8", newline="") as csv_file:
-        writer = csv.writer(csv_file)
-        writer.writerows(data)
+def save_list_csv(data: list, path: str):
+    try:
+        with open(path, mode="w", encoding="utf-8", newline="") as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerows(data)
+    except FileNotFoundError as e:
+        print(f'Error: Unable to find file path — {e}')
+
+def open_csv_list(path: str):
+    try:
+        with open(path, mode="r", encoding='utf-8') as csv_file:
+            data_csv = list(csv.reader(csv_file))
+            # print(data_csv)
+    except FileNotFoundError as e:
+        print(f'Error: Unable to find file path — {e}')
+        data_csv = []
+    return data_csv
 
 def convert_xlsx_to_csv(xlsx_path: str, output_dir: str):
     workbook = load_workbook(xlsx_path)
@@ -38,10 +51,11 @@ def convert_xlsx_to_csv(xlsx_path: str, output_dir: str):
                 pass
         column_index += 2
         output_path = os.path.join(output_dir, csv_file_name)
-        save_csv(data_to_csv, output_path)
+        save_list_csv(data_to_csv, output_path)
 
         print(csv_file_name)
 
-
 # xlsx_path1 = 'Data_BV.xlsx'
-# output_dir1 = 'CSV creation'
+# output_dir1 = 'CSV_creation'
+
+# print(open_csv_list('CSV_creation/STAD_DN10.csv'))
