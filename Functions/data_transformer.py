@@ -1,15 +1,18 @@
 from Data_BV import csv_processor as csv_pro
 import numpy
 import os
+import matplotlib.pyplot as plt
 
+#---------------------------------------#
 #-----------------To Do-----------------#
+# Одна функція для витягування даних з csv у потрібній формі
 
 def from_csv_data_sort(path: str):
     data = csv_pro.open_csv_list(path)
     top = data[0]
     data = data[1:]
 
-    sorted_data = sorted(data, key=lambda item: float(item[0].replace(",", ".")))
+    sorted_data = sorted(data, key=lambda item: float(item[0].replace(",", "."))) #TO
 
     x = []
     y = []
@@ -25,57 +28,55 @@ def from_csv_data_sort(path: str):
                     y.append(number)
                 else:
                     print(f"Error: [{i}] '{value}' is incorrect data.")
-
             except ValueError:
                 print(f"Error: [{i}] '{value}' is not a valid number.")
 
-
     return sorted_data, top, x, y
 
-
 #-----------------To Do-----------------#
+#---------------------------------------#
 
-def polynomial_equation_6(x, y):
-    deg = 6
-    coefficients = numpy.polyfit(x, y, 6)
-    c_value = {}
+#Створення словника з коефіцієнтами полінома
+def polynomial_dict(x: list, y: list, deg: int):
+    deg = deg #(x, y, deg = 6)
+    coefficients = numpy.polyfit(x, y, deg)
+    coeff_dict = {}
     for i, value in enumerate(coefficients):
         try:
             a = i + 1
             e = len(coefficients) - a
             x = f'x{e}'
-            c_value[x] = float(str(value))
+            coeff_dict[x] = float(str(value))
         except ValueError as e:
             print(f"Error converting value: {value} to float — {e}")
-    return c_value
+    return coeff_dict
 
+#Коефіцієнти полінома у numpy.polyval
+def polynomial_coeff(x: list, y: list, deg: int):
+    coefficients = numpy.polyfit(x, y, deg)
+    return coefficients
 
+#Створення графіку з даними і лінією полінома для BV
+def graph_eq_bv(x_values, y_values, coefficients: numpy.ndarray, name: str = ""):
+    plt.scatter(x_values, y_values, label='Data', color='red')
+    x_fit = numpy.linspace(min(x_values), max(x_values), 500)
+    y_fit = numpy.polyval(coefficients, x_fit)
+    plt.plot(x_fit, y_fit, label='Matched polynomial')
+    plt.xlabel('setpoint')
+    plt.ylabel('kv')
+    plt.title(f'Valve characteristics {name}')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
 
-# path_s = "Data_BV/CSV_creation/STAD_DN10.csv"
-# path = os.path.abspath(path_s)
-# print(from_csv_data_sort(path))
 
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-path_abs = os.path.join(base_dir,'Data_BV', 'CSV_creation','STAD_DN25.csv')
-# print(from_csv_data_sort(path_abs)[0])
-# print(from_csv_data_sort(path_abs)[1])
-# print(from_csv_data_sort(path_abs)[2])
-# print(from_csv_data_sort(path_abs)[3])
+path_abs = os.path.join(base_dir,'Data_BV', 'CSV_creation','TA-BVS_DN125.csv')
 
-x = from_csv_data_sort(path_abs)[2]
-y = from_csv_data_sort(path_abs)[3]
+xs = polynomial_coeff(from_csv_data_sort(path_abs)[2], from_csv_data_sort(path_abs)[3], 6)
 
-xs = polynomial_equation_6(from_csv_data_sort(path_abs)[2], from_csv_data_sort(path_abs)[3])
-
-# c_value = {}
-# for i, value in enumerate(xs):
-#     try:
-#         a = i + 1
-#         e = len(xs)-a
-#         x = f'x{e}'
-#         c_value[x] = float(str(value))
-#     except ValueError as e:
-#         print(f"Error converting value: {value} to float — {e}")
+graph_eq_bv(from_csv_data_sort(path_abs)[2], from_csv_data_sort(path_abs)[3], xs, from_csv_data_sort(path_abs)[1][0])
 
 print(xs)
 print(len(xs))
+print(type(xs))

@@ -2,6 +2,7 @@ import csv
 import os
 from openpyxl import load_workbook
 
+#Збереження списку у csv
 def save_list_csv(data: list, path: str):
     try:
         with open(path, mode="w", encoding="utf-8", newline="") as csv_file:
@@ -10,6 +11,7 @@ def save_list_csv(data: list, path: str):
     except FileNotFoundError as e:
         print(f'Error: Unable to find file path — {e}')
 
+#Закачування даних с csv до списку
 def open_csv_list(path: str):
     try:
         with open(path, mode="r", encoding='utf-8') as csv_file:
@@ -20,6 +22,7 @@ def open_csv_list(path: str):
         data_csv = []
     return data_csv
 
+#Збереження даних з xlsx по дві колонки у csv
 def convert_xlsx_to_csv(xlsx_path: str, output_dir: str):
     workbook = load_workbook(xlsx_path)
     sheet = workbook["Sheet1"]
@@ -35,7 +38,7 @@ def convert_xlsx_to_csv(xlsx_path: str, output_dir: str):
 
     column_index = 1
 
-    for x in data_all_rows[0][::2]:
+    for x in data_all_rows[0][::2]: #Ітерація по першому рядку з кроком 2
         data_to_csv = []
 
         heading = [x,data_all_rows[0][column_index]]
