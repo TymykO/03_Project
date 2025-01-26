@@ -206,17 +206,55 @@ def convert_xlsx_to_csv(xlsx_path: str, output_dir: str, sheet_name: str = "Shee
         return []
 
 
-#Збирання даних про клапан у словник
 def valve_data_processed(path_csv: str, deg: int):
-    data = from_csv_data_sort(path_csv)
-    name = data[1][0]
-    art_nr = data[1][1]
-    x = data[2]
-    y = data[3]
-    valve_data = data_transformer.polynomial_dict(x, y, deg)
-    valve_data['name'] = name
-    valve_data['article_number'] = art_nr
-    return valve_data
+    """
+    Обробляє дані клапана з CSV-файлу, виконує поліноміальне перетворення для даних x та y
+    і збирає результат у словник з додатковою інформацією.
+
+    Параметри:
+        path_csv (str): Шлях до CSV-файлу з даними клапана.
+        deg (int): Ступінь полінома для перетворення даних.
+
+    Повертає:
+        dict: Словник з результатами перетворення і додатковими даними клапана
+        (name, article_number).
+    """
+    try:
+        # Отримуємо відсортовані дані з CSV
+        data = from_csv_data_sort(path_csv)
+
+        # Перевірка наявності необхідних даних
+        if len(data) < 4:
+            print("Error: Insufficient data in CSV file.")
+            return {}
+
+        # Ініціалізація значень
+        name = data[1][0]
+        art_nr = data[1][1]
+        x = data[2]
+        y = data[3]
+
+        # Перевірка, чи є дані для x та y
+        if not x or not y:
+            print("Error: Missing data in x or y values.")
+            return {}
+
+        # Поліноміальне перетворення
+        valve_data = data_transformer.polynomial_dict(x, y, deg)
+
+        # Додавання інформації про клапан
+        valve_data['name'] = name
+        valve_data['article_number'] = art_nr
+
+        return valve_data
+
+    except FileNotFoundError:
+        print(f"Error: File '{path_csv}' not found.")
+        return {}
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return {}
+
 
 
 def prepare_data_for_csv(data: list[dict]) -> list:
