@@ -23,14 +23,18 @@ def open_csv_list(path: str):
         print(f'Error: Unable to find file path — {e}')
         data_csv = []
     return data_csv
+
+
 ####################
-#Збирає CSV-файли з папки CSV_creation і повертає їх шляхи.
+#Збирає CSV-файли з папки CSV_creation і повертає їх абсолютні шляхи.
 def list_csv_in_creation():
     # Отримуємо абсолютний шлях до папки Data_BV/CSV_creation
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))  # Шлях до кореня проєкту
     directory = os.path.abspath(os.path.join(base_dir, "Data_BV", "CSV_creation"))
     return get_csv_files(directory)
 #####################
+
+
 #---------------------------------------#
 #-----------------To Do-----------------#
 # Одна функція для витягування даних з csv у потрібній формі
@@ -116,9 +120,47 @@ def valve_data_processed(path_csv: str, deg: int):
     return valve_data
 
 
+def prepare_data_for_csv(data: list[dict]) -> list:
+    """
+    Створює список із даними для запису у форматі CSV.
 
-a = list_csv_in_creation()
-print(a)
+    Перший рядок містить ключі (заголовки), а наступні рядки — значення
+    відповідно до цих ключів. Підготовлений список передається до функції
+    `save_list_csv` для запису у файл.
+
+    Параметри:
+        data (list[dict]): Список із словників, який потрібно обробити.
+        path (str): Шлях до файлу, куди буде записано CSV.
+
+    Повертає:
+        list: Список, підготовлений для запису у CSV.
+
+    Помилки:
+        - Виводить повідомлення, якщо дані не є списком словників.
+    """
+    try:
+        # Перевірка на те, що дані є списком словників
+        if not data or not isinstance(data, list) or not isinstance(data[0], dict):
+            print("Error: The provided data must be a list of dictionaries.")
+            return []
+
+        # Отримання ключів із першого словника
+        keys = list(data[0].keys())
+        # Створення нового списку для запису
+        csv_data = [keys]  # Перший рядок — це заголовки
+
+        # Додаємо значення кожного словника у список
+        for item in data:
+            csv_data.append([item.get(key, "") for key in keys])  # Додаємо значення в порядку ключів
+
+        return csv_data
+
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return []
+
+# a = list_csv_in_creation()
+# print(a)
 
 
 # base_dir = os.path.abspath(__file__)
