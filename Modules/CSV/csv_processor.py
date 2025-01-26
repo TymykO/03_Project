@@ -256,6 +256,64 @@ def valve_data_processed(path_csv: str, deg: int):
         return {}
 
 
+def valve_data_aquapresso(path_csv: str, deg: int):
+    """
+    Обробляє дані клапана з CSV-файлу, виконує поліноміальне перетворення для даних x та y
+    і збирає результат у словник з додатковою інформацією for aquapresso.
+
+    Параметри:
+        path_csv (str): Шлях до CSV-файлу з даними клапана.
+        deg (int): Ступінь полінома для перетворення даних.
+
+    Повертає:
+        dict: Словник з результатами перетворення і додатковими даними клапана
+        (name, article_number).
+    """
+    try:
+        # Отримуємо відсортовані дані з CSV
+        data = from_csv_data_sort(path_csv)
+
+        # Перевірка наявності необхідних даних
+        if len(data) < 4:
+            print("Error: Insufficient data in CSV file.")
+            return {}
+
+        # Ініціалізація значень
+        name = data[1][0]
+        art_nr = data[1][1]
+        x = data[2]
+        y = data[3]
+        setting_max = max(x)
+        setting_min = min(x)
+        kv_max = max(y)
+        kv_min = min(y)
+
+
+        # Перевірка, чи є дані для x та y
+        if not x or not y:
+            print("Error: Missing data in x or y values.")
+            return {}
+
+        # Поліноміальне перетворення
+        valve_data = data_transformer.polynomial_dict(x, y, deg)
+
+        # Додавання інформації про клапан
+        valve_data['name'] = name
+        valve_data['article_number'] = art_nr
+        valve_data[' setting_max'] = setting_max
+        valve_data['setting_min'] = setting_min
+        valve_data['kv_max'] = kv_max
+        valve_data['kv_min'] = kv_min
+
+        return valve_data
+
+    except FileNotFoundError:
+        print(f"Error: File '{path_csv}' not found.")
+        return {}
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return {}
+
 
 def prepare_data_for_csv(data: list[dict]) -> list:
     """
@@ -296,7 +354,7 @@ def prepare_data_for_csv(data: list[dict]) -> list:
         print(f"An unexpected error occurred: {e}")
         return []
 
-# a = list_csv_in_creation()
+# a = valve_data_aquapresso()
 # print(a)
 
 

@@ -1,6 +1,4 @@
-#from Data_BV import csv_processor as csv_pro
 import numpy
-#import os
 import matplotlib.pyplot as plt
 
 #Створення словника з коефіцієнтами полінома
