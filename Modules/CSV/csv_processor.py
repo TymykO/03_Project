@@ -23,14 +23,14 @@ def open_csv_list(path: str):
         print(f'Error: Unable to find file path — {e}')
         data_csv = []
     return data_csv
-
+####################
 #Збирає CSV-файли з папки CSV_creation і повертає їх шляхи.
 def list_csv_in_creation():
     # Отримуємо абсолютний шлях до папки Data_BV/CSV_creation
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))  # Шлях до кореня проєкту
     directory = os.path.abspath(os.path.join(base_dir, "Data_BV", "CSV_creation"))
     return get_csv_files(directory)
-
+#####################
 #---------------------------------------#
 #-----------------To Do-----------------#
 # Одна функція для витягування даних з csv у потрібній формі
@@ -78,6 +78,7 @@ def convert_xlsx_to_csv(xlsx_path: str, output_dir: str):
             break
 
     column_index = 1
+    csv_files = []
 
     for x in data_all_rows[0][::2]: #Ітерація по першому рядку з кроком 2
         data_to_csv = []
@@ -96,7 +97,10 @@ def convert_xlsx_to_csv(xlsx_path: str, output_dir: str):
         column_index += 2
         output_path = os.path.join(output_dir, csv_file_name)
         save_list_csv(data_to_csv, output_path)
-        return csv_file_name
+
+        csv_files.append(csv_file_name)
+
+    return csv_files
 
 
 #Збирання даних про клапан у словник
