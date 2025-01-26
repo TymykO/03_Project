@@ -4,8 +4,23 @@ from openpyxl import load_workbook
 from Modules.Transform import data_transformer
 from Modules.Utils.file_manager import get_csv_files
 
-#Збереження списку у csv
 def save_list_csv(data: list, path: str):
+    """
+    Зберігає список у CSV-файл.
+
+    Кожен вкладений список у `data` відповідає одному рядку у CSV-файлі.
+    Якщо файл за вказаним шляхом не існує, функція створить його.
+
+    Параметри:
+        data (list): Двовимірний список, де кожен підсписок відповідає рядку у CSV.
+        path (str): Шлях до файлу, куди зберігатиметься список.
+
+    Помилки:
+        - Виводить повідомлення про помилку, якщо шлях до файлу не знайдено (FileNotFoundError).
+
+    Приклад використання:
+        save_list_csv([["name", "age"], ["Alice", 30]], "output.csv")
+    """
     try:
         with open(path, mode="w", encoding="utf-8", newline="") as csv_file:
             writer = csv.writer(csv_file)
@@ -13,8 +28,26 @@ def save_list_csv(data: list, path: str):
     except FileNotFoundError as e:
         print(f'Error: Unable to find file path — {e}')
 
-#Закачування даних с csv до списку
 def open_csv_list(path: str):
+    """
+    Читає дані з CSV-файлу і повертає їх у вигляді списку.
+
+    Кожен рядок у CSV-файлі перетворюється на список, а всі рядки
+    зберігаються у вигляді вкладеного списку.
+
+    Параметри:
+        path (str): Шлях до CSV-файлу.
+
+    Повертає:
+        list: Вкладений список, де кожен елемент — рядок з файлу.
+
+    Помилки:
+        - Виводить повідомлення про помилку, якщо шлях до файлу не знайдено (FileNotFoundError).
+        - Якщо виникла помилка, функція повертає порожній список.
+
+    Приклад використання:
+        data = open_csv_list("input.csv")
+    """
     try:
         with open(path, mode="r", encoding='utf-8') as csv_file:
             data_csv = list(csv.reader(csv_file))
@@ -24,21 +57,67 @@ def open_csv_list(path: str):
         data_csv = []
     return data_csv
 
-
-####################
-#Збирає CSV-файли з папки CSV_creation і повертає їх абсолютні шляхи.
 def list_csv_in_creation():
+    """
+    Збирає всі CSV-файли з папки `CSV_creation` і повертає їх абсолютні шляхи.
+
+    Функція шукає файли у папці `Data_BV/CSV_creation`, яка знаходиться
+    відносно кореня проєкту. Використовує абсолютний шлях для пошуку.
+
+    Параметри:
+        Немає.
+
+    Повертає:
+        list: Список абсолютних шляхів до всіх CSV-файлів у папці.
+
+    Залежності:
+        Функція використовує `get_csv_files(directory)` для пошуку файлів.
+
+    Приклад використання:
+        csv_files = list_csv_in_creation()
+    """
     # Отримуємо абсолютний шлях до папки Data_BV/CSV_creation
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))  # Шлях до кореня проєкту
     directory = os.path.abspath(os.path.join(base_dir, "Data_BV", "CSV_creation"))
     return get_csv_files(directory)
-#####################
 
-
-#---------------------------------------#
 #-----------------To Do-----------------#
-# Одна функція для витягування даних з csv у потрібній формі
 def from_csv_data_sort(path: str):
+    """
+    Завантажує дані з CSV-файлу, сортує їх за першим стовпцем і розділяє на масиви X та Y.
+
+    Функція:
+    1. Читає дані з CSV-файлу, використовуючи `open_csv_list`.
+    2. Перший рядок (заголовки) зберігає у змінній `top`.
+    3. Сортує рядки даних за значенням у першому стовпці (після перетворення на float).
+    4. Розділяє дані на два списки:
+        - `x`: значення першого стовпця (типу float).
+        - `y`: значення другого стовпця (типу float).
+    5. Виводить повідомлення про помилки, якщо дані не вдалося перетворити на числа.
+
+    Параметри:
+        path (str): Шлях до CSV-файлу.
+
+    Повертає:
+        tuple: Кортеж із чотирьох елементів:
+            - sorted_data (list): Відсортовані рядки даних.
+            - top (list): Заголовки CSV-файлу.
+            - x (list): Значення першого стовпця у вигляді чисел (float).
+            - y (list): Значення другого стовпця у вигляді чисел (float).
+
+    Помилки:
+        - Якщо значення у стовпці неможливо перетворити на число, виводиться повідомлення з індексом і значенням.
+
+    Приклад використання:
+        sorted_data, top, x, y = from_csv_data_sort("data.csv")
+
+    Залежності:
+        - Використовує функцію `open_csv_list` для завантаження даних із CSV.
+
+    Примітка:
+        Функція очікує, що перший стовпець містить значення для сортування (типу float), а другий стовпець містить числові дані.
+
+    """
     data = open_csv_list(path)
     top = data[0]
     data = data[1:]
@@ -62,9 +141,7 @@ def from_csv_data_sort(path: str):
             except ValueError:
                 print(f"Error: [{i}] '{value}' is not a valid number.")
     return sorted_data, top, x, y
-
 #-----------------To Do-----------------#
-#---------------------------------------#
 
 
 #Збереження даних з xlsx по дві колонки у csv
