@@ -96,9 +96,10 @@ def convert_xlsx_to_csv(xlsx_path: str, output_dir: str):
         column_index += 2
         output_path = os.path.join(output_dir, csv_file_name)
         save_list_csv(data_to_csv, output_path)
+        return csv_file_name
 
-        print(csv_file_name)
 
+#Збирання даних про клапан у словник
 def valve_data_processed(path_csv: str, deg: int):
     data = from_csv_data_sort(path_csv)
     name = data[1][0]
