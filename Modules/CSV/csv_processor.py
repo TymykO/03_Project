@@ -144,44 +144,66 @@ def from_csv_data_sort(path: str):
 #-----------------To Do-----------------#
 
 
-#Збереження даних з xlsx по дві колонки у csv
-def convert_xlsx_to_csv(xlsx_path: str, output_dir: str):
-    workbook = load_workbook(xlsx_path)
-    sheet = workbook["Sheet1"]
+def convert_xlsx_to_csv(xlsx_path: str, output_dir: str, sheet_name: str = "Sheet1"):
+    """
+    Конвертує дані з XLSX у CSV, зберігаючи пари колонок у окремих CSV-файлах.
 
-    data_all_rows = []
+    Параметри:
+        xlsx_path (str): Шлях до вхідного XLSX-файлу.
+        output_dir (str): Директорія, куди будуть збережені CSV-файли.
+        sheet_name (str): Назва листа у XLSX-файлі (за замовчуванням "Sheet1").
 
-    for row in sheet.iter_rows(min_row=1, values_only=True):
-        if len(row)%2 == 0:
-            data_all_rows.append(row)
-        else:
-            print('Odd number of columns, program stopped.')
-            break
+    Повертає:
+        list: Список імен згенерованих CSV-файлів.
+    """
+    try:
+        # Завантажуємо Excel-файл
+        workbook = load_workbook(xlsx_path)
 
-    column_index = 1
-    csv_files = []
+        # Перевіряємо, чи існує потрібний лист
+        if sheet_name not in workbook.sheetnames:
+            print(f"Error: Sheet '{sheet_name}' not found in the workbook.")
+            return []
 
-    for x in data_all_rows[0][::2]: #Ітерація по першому рядку з кроком 2
-        data_to_csv = []
+        sheet = workbook[sheet_name]
 
-        heading = [x,data_all_rows[0][column_index]]
-        data_to_csv.append(heading)
-        csv_file_name = f'{x.replace(' ', '_')}.csv'
+        # Збираємо всі рядки
+        data_all_rows = [row for row in sheet.iter_rows(min_row=1, values_only=True)]
 
-        for y in data_all_rows[1:]:
-            setting = y[column_index - 1]
-            kv = y[column_index]
-            if setting is not None and kv is not None:
-                data_to_csv.append([setting, kv])
-            else:
-                pass
-        column_index += 2
-        output_path = os.path.join(output_dir, csv_file_name)
-        save_list_csv(data_to_csv, output_path)
+        # Перевірка парності колонок
+        if not data_all_rows or len(data_all_rows[0]) % 2 != 0:
+            print("Error: Odd number of columns in the sheet. Operation stopped.")
+            return []
 
-        csv_files.append(csv_file_name)
+        # Обробка колонок
+        csv_files = []
+        for column_index in range(0, len(data_all_rows[0]), 2):
+            heading = [data_all_rows[0][column_index], data_all_rows[0][column_index + 1]]
+            data_to_csv = [heading]
 
-    return csv_files
+            # Додаємо дані рядків
+            for row in data_all_rows[1:]:
+                setting = row[column_index]
+                kv = row[column_index + 1]
+                if setting is not None and kv is not None:
+                    data_to_csv.append([setting, kv])
+
+            # Створюємо ім'я файлу
+            csv_file_name = f"{heading[0].replace(' ', '_').replace('/', '_')}.csv"
+            output_path = os.path.join(output_dir, csv_file_name)
+
+            # Зберігаємо CSV
+            save_list_csv(data_to_csv, output_path)
+            csv_files.append(csv_file_name)
+
+        return csv_files
+
+    except FileNotFoundError:
+        print(f"Error: File '{xlsx_path}' not found.")
+        return []
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return []
 
 
 #Збирання даних про клапан у словник

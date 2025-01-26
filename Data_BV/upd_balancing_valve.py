@@ -32,6 +32,7 @@ def upd_all():
     pass
 
 
-# a = save_all_valve_data()
-# print(a)
-# # print(download_all_valve_data())
+print(upd_csv_from_xlsx())
+a = save_all_valve_data()
+print(a)
+# print(download_all_valve_data())
