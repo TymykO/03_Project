@@ -1,5 +1,8 @@
-from Modules.CSV.csv_processor import valve_data_processed, list_csv_in_creation, convert_xlsx_to_csv, save_list_csv, prepare_data_for_csv
+from Modules.CSV.csv_processor import valve_data_processed, list_csv_in_creation, convert_xlsx_to_csv, save_list_csv, \
+    prepare_data_for_csv, from_csv_data_sort
 import os
+
+from Modules.Transform.data_transformer import polynomial_coeff, graph_eq_bv, save_figure
 
 
 #Закачуємо всі дані з Data_BV.xlsx в окремі CSV файли, розділені та посортовані для решти процесів, повертає список записаних файлів до CSV_creation
@@ -7,7 +10,7 @@ def upd_csv_from_xlsx():
     base_dir = os.path.dirname(__file__)
     directory = os.path.join(base_dir, "Data_BV.xlsx")
     output_dir = os.path.join(base_dir, "CSV_creation")
-    return convert_xlsx_to_csv(directory, output_dir)
+    return convert_xlsx_to_csv(directory, output_dir, "Sheet1")
 
 #Збирає з "CSV_creation" дані клапана і коефіцієнти для рівняння у словник і попертає список зі словником для кожного файлу в дерикторії
 def download_all_valve_data():
@@ -28,11 +31,48 @@ def save_all_valve_data():
     save_list_csv(data, output_dir) #Записує список зі словників
     return output_dir
 
+def save_all_graph_valve():
+    #Створення шляху запису зображення
+    base_dir = os.path.dirname(os.path.dirname(__file__))
+    output_dir = os.path.join(base_dir, "Graphs")
+    #Створення списку шляхів до файлів csv
+    paths_data = list_csv_in_creation()
+    csv_paths = paths_data[1]
+    graphs = []
+
+    for path in csv_paths:
+        #Витягую дані для побудови графіку
+        data_csv = from_csv_data_sort(path)
+        x = list(data_csv[2])
+        y = list(data_csv[3])
+        name = str(data_csv[1][0])
+
+        #Обчислення коефіціентів
+        deg = 6 #Степінь полінома
+        coefficients = polynomial_coeff(x, y, deg)
+
+        #Створення графіка
+        fig = graph_eq_bv(x, y, coefficients, name)
+
+        #Запис зображення графіка
+        file_name = f'{name}.png'
+        output_paht = os.path.join(output_dir, file_name)
+        save_figure(fig, output_paht)
+
+
+        graphs.append(file_name)
+
+    return graphs
+
+
+
 def upd_all():
     pass
 
 
-print(upd_csv_from_xlsx())
-a = save_all_valve_data()
-print(a)
+print(save_all_graph_valve())
+
+# print(upd_csv_from_xlsx())
+# a = save_all_valve_data()
+# print(a)
 # print(download_all_valve_data())

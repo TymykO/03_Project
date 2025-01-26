@@ -23,8 +23,8 @@ def polynomial_coeff(x: list, y: list, deg: int):
     coefficients = numpy.polyfit(x, y, deg)
     return coefficients
 
-#Створення графіку з даними і лінією полінома для BV
-def graph_eq_bv(x_values: list, y_values: list, coefficients: numpy.ndarray, name: str = ""):
+#Створення графіку з даними та лінією полінома для характеристики клапана
+def graph_eq_bv(x_values: list, y_values: list, coefficients: numpy.ndarray, name: str = "name"):
     # Створюємо нову фігуру
     fig, ax = plt.subplots()  # fig — це об'єкт Figure, ax — об'єкт осей
     ax.scatter(x_values, y_values, label='Data', color='red')  # Додаємо точки
